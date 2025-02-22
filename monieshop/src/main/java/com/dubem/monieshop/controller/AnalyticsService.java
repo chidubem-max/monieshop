@@ -4,6 +4,7 @@ import com.dubem.monieshop.model.Transaction;
 import com.dubem.monieshop.repository.TransactionRepository;
 import lombok.Value;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -12,8 +13,10 @@ import java.util.Map;
 /**
  * DTO for {@link com.dubem.monieshop.model.Transaction}
  */
-@Value
+@Service
 public class AnalyticsService  {
+
+
     private final TransactionRepository repository;
 
     public AnalyticsService(TransactionRepository repository) {
@@ -24,7 +27,7 @@ public class AnalyticsService  {
     @Cacheable("highestSalesVolumeDay")
     public long highestSalesVolumeDay() {
         return repository.findAll().stream()
-                .mapToLong(tx -> tx.getProductsSold().values().stream().mapToInt(Integer::intValue).sum())
+                .mapToLong(tx -> tx.getProductsSold().values().stream().sum())
                 .max()
                 .orElse(0);
     }
@@ -37,6 +40,4 @@ public class AnalyticsService  {
                 .orElse(0.0);
     }
 
-    public Double getHighestSalesValueInDay() {
-    }
 }

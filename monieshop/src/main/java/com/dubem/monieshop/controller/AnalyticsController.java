@@ -18,20 +18,21 @@ import java.util.Map;
 @RequestMapping("/analytics")
 public class AnalyticsController {
 
-    private final AnalyticsService analyticsService;
+
+    private AnalyticsService analyticsService;
 
     public AnalyticsController(AnalyticsService analyticsService) {
         this.analyticsService = analyticsService;
     }
 
-    @GetMapping("\"/highest-sales-day\"")
-    public Double highestSalesDay() {
-        return analyticsService.getHighestSalesValueInDay();
+    @GetMapping("\"/highest-sales-volume-day\"")
+    public long getHighestSalesVolumeDay() {
+        return analyticsService.highestSalesVolumeDay();
     }
 
-    @GetMapping("\"/most-sold-product\"")
-    public Long mostSoldProduct() {
-        return analyticsService.getMostSoldProduct();
+    @GetMapping("\"/highest-sales-value-day\"")
+    public double getHighestSalesValueDay() {
+        return analyticsService.highestSalesValueDay();
     }
 
 }

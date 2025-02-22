@@ -3,6 +3,7 @@ package com.dubem.monieshop.service;
 import com.dubem.monieshop.model.Transaction;
 import com.dubem.monieshop.repository.TransactionRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -19,6 +20,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class TransactionService {
+
 
     private final TransactionRepository repository;
 
@@ -45,10 +47,7 @@ public class TransactionService {
             double saleAmount = Double.parseDouble(parts[3]);
 
             Transaction transaction = new Transaction();
-            transaction.setSalesStaffId(salesStaffId);
-            transaction.setTransactionTime(transactionTime);
-            transaction.setProductsSold(products);
-            transaction.setSaleAmount(saleAmount);
+
 
 
             repository.save(transaction);

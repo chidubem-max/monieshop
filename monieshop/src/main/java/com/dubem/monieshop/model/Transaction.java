@@ -11,7 +11,7 @@ import java.util.Map;
 
 @Entity
 @Getter
-@NoArgsConstructor
+@Table(name = "transactions")
 public class Transaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,26 +26,25 @@ public class Transaction {
     @ElementCollection
     private Map<Long, Integer> productsSold;
 
+
+    public Transaction() {}
+
+
+
     public Transaction(int salesStaffId, LocalDateTime time, double saleAmount, Map<Long, Integer> products) {
-    }
-
-
-    public void setTransactionTime(LocalDateTime transactionTime) {
-        this.transactionTime = transactionTime;
-    }
-
-    public void setSalesStaffId(int salesStaffId) {
         this.salesStaffId = salesStaffId;
-    }
-
-    public Map<Object, Object> getProductsSold() {
-    }
-
-    public void setProductsSold(Map<Long, Integer> productsSold) {
-        this.productsSold = productsSold;
-    }
-
-    public void setSaleAmount(double saleAmount) {
+        this.transactionTime = time;
         this.saleAmount = saleAmount;
+        this.productsSold = products;
     }
+
+
+
+
+    public Map<Long, Integer> getProductsSold() {
+        return productsSold;
+    }
+
+
+
 }

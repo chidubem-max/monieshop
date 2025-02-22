@@ -1,7 +1,12 @@
 package com.dubem.monieshop.service;
 
 import com.dubem.monieshop.model.Transaction;
+import com.dubem.monieshop.repository.TransactionRepository;
+import jakarta.transaction.Transactional;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -14,35 +19,41 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class TransactionService {
-    public List<Transaction> readTransactionsFromFile(Path filePath) throws IOException {
-        List<Transaction> transactions = new ArrayList<>();
-        List<String> lines = Files.readAllLines(filePath);
 
-        for (String line : lines) {
+    private final TransactionRepository repository;
+
+    public TransactionService(TransactionRepository repository) {
+        this.repository = repository;
+    }
+
+    @Transactional
+    public void processFile(File file) throws Exception {
+        BufferedReader br = new BufferedReader(new FileReader(file));
+        String line;
+        while ((line = br.readLine()) != null) {
             String[] parts = line.split(",");
-            if (parts.length != 4) continue;
-
             int salesStaffId = Integer.parseInt(parts[0]);
-            LocalDateTime time = LocalDateTime.parse(parts[1]);
-            double saleAmount = Double.parseDouble(parts[3]);
+            LocalDateTime transactionTime = LocalDateTime.parse(parts[1]);
 
             Map<Long, Integer> products = new HashMap<>();
-            String productDetails = parts[2].replaceAll("[\\[\\]]", "");
-            for (String product : productDetails.split("\\|")) {
-                String[] p = product.split(":");
-                products.put(Long.parseLong(p[0]), Integer.parseInt(p[1]));
+            String productsData = parts[2].replace("[", "").replace("]", "");
+            for (String productEntry : productsData.split("\\|")) {
+                String[] productParts = productEntry.split(":");
+                products.put(Long.parseLong(productParts[0]), Integer.parseInt(productParts[1]));
             }
 
-            transactions.add(new Transaction(salesStaffId, time, saleAmount, products));
-        }
-        return transactions;
-    }
+            double saleAmount = Double.parseDouble(parts[3]);
 
-    public Map<LocalDate, Double> getHighestSalesValuePerDay(List<Transaction> transactions) {
-        return transactions.stream()
-                .collect(Collectors.groupingBy(
-                        t -> t.getTransactionTime().toLocalDate(),
-                        Collectors.summingDouble(Transaction::getSaleAmount)
-                ));
+            Transaction transaction = new Transaction();
+            transaction.setSalesStaffId(salesStaffId);
+            transaction.setTransactionTime(transactionTime);
+            transaction.setProductsSold(products);
+            transaction.setSaleAmount(saleAmount);
+
+
+            repository.save(transaction);
+        }
+        br.close();
     }
 }
+

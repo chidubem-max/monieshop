@@ -3,6 +3,7 @@ package com.dubem.monieshop.controller;
 import com.dubem.monieshop.model.Transaction;
 import com.dubem.monieshop.service.TransactionService;
 import jakarta.persistence.criteria.Path;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -14,19 +15,23 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping()
+@RequestMapping("/analytics")
 public class AnalyticsController {
 
-    private final TransactionService transactionService;
+    private final AnalyticsService analyticsService;
 
-    public AnalyticsController(TransactionService transactionService) {
-        this.transactionService = transactionService;
+    public AnalyticsController(AnalyticsService analyticsService) {
+        this.analyticsService = analyticsService;
     }
 
-    @GetMapping("/highest_sales_day")
-    public Map<LocalDate, Double> highestSalesDay() throws IOException {
-        Path filePath = (Path) Paths.get("transactions.txt");
-        List<Transaction> transactions = transactionService.readTransactionsFromFile(filePath);
-        return transactionService.getHighestSalesValuePerDay(transactions);
+    @GetMapping("\"/highest-sales-day\"")
+    public Double highestSalesDay() {
+        return analyticsService.getHighestSalesValueInDay();
     }
+
+    @GetMapping("\"/most-sold-product\"")
+    public Long mostSoldProduct() {
+        return analyticsService.getMostSoldProduct();
+    }
+
 }
